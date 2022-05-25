@@ -1,4 +1,5 @@
 """Pupper class definition."""
+import os
 import re
 from typing import Union
 
@@ -15,7 +16,22 @@ class Pupper():
             self,
             calibration_file: str
         ) -> None:
-        self._calibration_file = calibration_file
+        with open('/home/ubuntu/.hw_version', 'r') as hw_f:
+            hw_version = hw_f.readline()
+
+        if hw_version == 'P1\n':
+            self._calibration_file = '/home/ubuntu/.nv_file'
+            self.servo1_en = 19
+            self.servo2_en = 26
+        else:
+            self._calibration_file = calibration_file
+            self.servo1_en = 25
+            self.servo2_en = 21
+
+        # Stop the robot daemon
+        self.stop_daemon()
+
+        # Set all four legs
         self.left_front = Leg('left-front', '1: Left-Front', 0, 0, -90, 'green')
         self.right_front = Leg('right-front', '2: Right-Front', 0, 0, -90, 'blue')
         self.left_back = Leg('left-back', '3: Left-Back', 0, 0, -90, 'green')
@@ -23,6 +39,9 @@ class Pupper():
 
         # Leg calibration data
         self.calibration = LegCalibrationData()
+
+        # Initialize overload counter
+        self.overload_hold_counter = 0
 
     def read_calibration_file(self) -> bool:
         """Read all lines text from EEPROM."""
@@ -44,7 +63,6 @@ class Pupper():
                 [-45, -45, -45, -45]
             ])
             self.calibration.matrix_eeprom = matrix
-        #update
 
         for i in range(3):
             for j in range(4):
@@ -131,3 +149,44 @@ class Pupper():
         # that serves as a warning like in the original GUI version.
         return True
 
+    def overload_detection(
+            self,
+            overload_current_max: int = 1500000,
+            overload_hold_counter_max: int = 100) -> bool:
+        """Detect any system overloads from battery."""
+        overload = False
+
+        r = os.popen('cat /sys/class/power_supply/max1720x_battery/current_now')
+        feedback = str(r.readlines())
+        current_now = int(feedback[3:len(feedback)-4])
+
+        if current_now > overload_current_max:
+            self.overload_hold_counter += 1
+            if self.overload_hold_counter > overload_hold_counter_max:
+                self.overload_hold_counter = overload_hold_counter_max     
+                os.popen(f'echo 0 > /sys/class/gpio/gpio{self.servo1_en}/value')
+                os.popen(f'echo 0 > /sys/class/gpio/gpio{self.servo2_en}/value')
+                overload = True
+            else:
+                overload = False
+        else:
+            self.overload_hold_counter -= 10
+            if self.overload_hold_counter < 0:
+                self.overload_hold_counter = 0
+                os.popen(f'echo 1 > /sys/class/gpio/gpio{self.servo1_en}/value')
+                os.popen(f'echo 1 > /sys/class/gpio/gpio{self.servo2_en}/value')
+                overload = False
+
+        return overload
+
+    def stop_daemon(self) -> None:
+        """Stop the robot daemon to allow for calibration."""
+        os.system('sudo systemctl stop robot')
+        os.system(f'echo 1 > /sys/class/gpio/gpio{self.servo1_en}/value')
+        os.system(f'echo 1 > /sys/class/gpio/gpio{self.servo2_en}/value')
+
+    def start_daemon(self) -> None:
+        """Start the robot daemon after finishing calibration."""
+        os.system('sudo systemctl start robot')
+        os.system(f'echo 1 > /sys/class/gpio/gpio{self.servo1_en}/value')
+        os.system(f'echo 1 > /sys/class/gpio/gpio{self.servo2_en}/value')

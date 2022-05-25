@@ -8,9 +8,6 @@ from typing import List
 import os
 
 import numpy as np
-# from pupper.HardwareInterface import HardwareInterface
-
-ServoCalibrationFilePath = '/sys/bus/nvmem/devices/3-00501/nvmem'
 
 from rich import print as r_print
 from rich.layout import Layout
@@ -20,6 +17,16 @@ from mp_calibration_tool.leg import Leg
 from mp_calibration_tool.options import create_options_panel
 from mp_calibration_tool.pupper import Pupper
 from mp_calibration_tool.title import create_title_panel
+
+# from pupper.HardwareInterface import HardwareInterface
+
+OverLoadCurrentMax = 1500000
+OverLoadHoldCounterMax = 100     # almost 3s
+ServoCalibrationFilePath = '/sys/bus/i2c/devices/3-0050/eeprom'
+
+servo1_en = 25
+servo2_en = 21
+hw_version = ''
 
 
 def main():
@@ -71,7 +78,7 @@ def main():
     while True:
         keyboard_input = get_key(settings)
         if keyboard_input in ['q', 'Q']:
-            # os.system('sudo systemctl start robot')
+            pupper.start_daemon()
             break
 
         if keyboard_input in ['1', '2', '3', '4']:
