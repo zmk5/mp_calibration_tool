@@ -4,7 +4,6 @@ import sys
 import _thread
 import termios
 import time
-from typing import List
 import os
 
 import numpy as np
@@ -12,13 +11,13 @@ import numpy as np
 from rich import print as r_print
 from rich.layout import Layout
 
+# from pupper.HardwareInterface import HardwareInterface
+
 from mp_calibration_tool.keyboard import get_key
-from mp_calibration_tool.leg import Leg
 from mp_calibration_tool.options import create_options_panel
 from mp_calibration_tool.pupper import Pupper
 from mp_calibration_tool.title import create_title_panel
 
-# from pupper.HardwareInterface import HardwareInterface
 
 OverLoadCurrentMax = 1500000
 OverLoadHoldCounterMax = 100     # almost 3s
@@ -30,7 +29,7 @@ hw_version = ''
 
 
 def main():
-    # os.system('sudo systemctl stop robot')
+    """Run the mini pupper calibration tool."""
     settings = termios.tcgetattr(sys.stdin)
     pupper = Pupper(ServoCalibrationFilePath)
     leg_options = {
