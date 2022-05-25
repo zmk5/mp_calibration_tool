@@ -5,6 +5,8 @@ from typing import Union
 
 import numpy as np
 
+from pupper.HardwareInterface import HardwareInterface
+
 from mp_calibration_tool.calibration import LegCalibrationData
 from mp_calibration_tool.leg import Leg
 
@@ -30,6 +32,9 @@ class Pupper():
 
         # Stop the robot daemon
         self.stop_daemon()
+
+        # Instantiate the hardware servo
+        self.hardware_interface = HardwareInterface()
 
         # Set all four legs
         self.left_front = Leg('left-front', '1: Left-Front', 0, 0, -90, 'green')
