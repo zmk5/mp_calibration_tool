@@ -37,10 +37,12 @@ class Pupper():
         self.hardware_interface = HardwareInterface()
 
         # Set all four legs
-        self.left_front = Leg('left-front', '1: Left-Front', 0, 0, -90, 'green')
-        self.right_front = Leg('right-front', '2: Right-Front', 0, 0, -90, 'blue')
-        self.left_back = Leg('left-back', '3: Left-Back', 0, 0, -90, 'green')
-        self.right_back = Leg('right-back', '4: Right-Back', 0, 0, -90, 'blue')
+        self.leg = {
+            'lf': Leg('left-front', '1: Left-Front', 0, 0, -90, 'green'),
+            'rf': Leg('right-front', '2: Right-Front', 0, 0, -90, 'blue'),
+            'lb': Leg('left-back', '3: Left-Back', 0, 0, -90, 'green'),
+            'rb': Leg('right-back', '4: Right-Back', 0, 0, -90, 'blue'),
+        }
 
         # Leg calibration data
         self.calibration = LegCalibrationData()
@@ -109,13 +111,13 @@ class Pupper():
 
     def modify_all_leg_joint_values(self, values) -> None:
         """Modify all four leg's joint values."""
-        self.left_front.change_joint_values(
+        self.leg['lf'].change_joint_values(
             values[0][0], values[0][1], values[0][2])
-        self.right_front.change_joint_values(
+        self.leg['rf'].change_joint_values(
             values[1][0], values[1][1], values[1][2])
-        self.left_back.change_joint_values(
+        self.leg['lb'].change_joint_values(
             values[2][0], values[2][1], values[2][2])
-        self.right_back.change_joint_values(
+        self.leg['rb'].change_joint_values(
             values[3][0], values[3][1], values[3][2])
 
     def reset_leg_joint_values(self) -> bool:
@@ -133,10 +135,10 @@ class Pupper():
         """Update all the leg joint values."""
         # NOTE: be careful here since the original value and angle are 3x4 not 4x3.
         value = []
-        value.append(self.left_front.get_all_joint_values())
-        value.append(self.right_front.get_all_joint_values())
-        value.append(self.left_back.get_all_joint_values())
-        value.append(self.right_back.get_all_joint_values())
+        value.append(self.leg['lf'].get_all_joint_values())
+        value.append(self.leg['rf'].get_all_joint_values())
+        value.append(self.leg['lb'].get_all_joint_values())
+        value.append(self.leg['rb'].get_all_joint_values())
         angle = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
         for i in range(3):
             for j in range(4):
