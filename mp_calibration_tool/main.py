@@ -15,12 +15,12 @@ from rich.layout import Layout
 
 from mp_calibration_tool.keyboard import get_key
 from mp_calibration_tool.options import create_options_panel
-from mp_calibration_tool.pupper import Pupper
+from mp_calibration_tool.quadruped import Pupper
 from mp_calibration_tool.title import create_title_panel
 
 
 OverLoadCurrentMax = 1500000
-OverLoadHoldCounterMax = 100     # almost 3s
+OverLoadHoldCounterMax = 100  # almost 3s
 ServoCalibrationFilePath = '/sys/bus/i2c/devices/3-0050/eeprom'
 
 servo1_en = 25
