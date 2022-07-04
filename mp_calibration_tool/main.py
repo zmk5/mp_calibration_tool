@@ -13,14 +13,14 @@ from typing import Union
 
 import numpy as np
 
-from rich import print as r_print
-from rich.layout import Layout
-
 from rich import box
+from rich import print as r_print
 from rich.align import Align
+from rich.layout import Layout
 from rich.panel import Panel
 from rich.table import Table
 
+os.chdir('/home/ubuntu/Robotics/QuadrupedRobot/StanfordQuadruped/')
 from pupper.HardwareInterface import HardwareInterface
 
 OverLoadCurrentMax = 1500000
@@ -111,7 +111,6 @@ class LegCalibrationData():
     ])
 
 
-## leg.py
 class Leg():
 
     def __init__(
