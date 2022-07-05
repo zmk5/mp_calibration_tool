@@ -36,10 +36,7 @@ def get_key(settings: Optional[List] = None) -> str:
     """Return the latest pressed key on a keyboard."""
     tty.setraw(sys.stdin.fileno())
     rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
-    if rlist:
-        key = sys.stdin.read(1)
-    else:
-        key = ''
+    key = sys.stdin.read(1) if rlist else ''
 
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
